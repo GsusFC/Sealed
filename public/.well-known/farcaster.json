@@ -1,0 +1,21 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEyMzQ1LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9",
+    "payload": "eyJkb21haW4iOiJzZWFsZWRhcHAubmV0bGlmeS5hcHAifQ",
+    "signature": "MHg..."
+  },
+  "frame": {
+    "version": "next",
+    "imageUrl": "https://sealedapp.netlify.app/og-image.png",
+    "button": {
+      "title": "Open Sealed",
+      "action": {
+        "type": "launch_frame",
+        "name": "Sealed",
+        "url": "https://sealedapp.netlify.app",
+        "splashImageUrl": "https://sealedapp.netlify.app/splash.png",
+        "splashBackgroundColor": "#1A1A1A"
+      }
+    }
+  }
+}
