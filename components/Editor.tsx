@@ -145,9 +145,10 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const isSealed = existingEntry?.is_sealed || false;
 
   return (
-    <div className="w-full pb-32">
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-8">
+    <div className="fixed inset-0 pt-24 flex flex-col bg-white">
+      {/* Header arriba */}
+      <div className="flex-shrink-0 px-6 py-4">
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
           <h2 className="text-lg text-gray-500">
             {formatDate(existingEntry?.date || Date.now())}
           </h2>
@@ -159,56 +160,69 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
         </div>
       </div>
 
-      <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        disabled={isSealed}
-        placeholder="Write your thoughts..."
-        className="w-full min-h-[500px] p-0 border-none focus:ring-0 focus:outline-none resize-none text-lg leading-relaxed"
-        style={{ fontFamily: 'inherit' }}
-      />
-
-      <div className="mt-8 flex items-center justify-between border-t pt-6 pb-6">
-        <div className="text-sm text-gray-400">
-          {wordCount} words
-        </div>
-
-        <div className="flex gap-3">
-          {!isSealed && (
-            <>
-              <button
-                onClick={handleSave}
-                disabled={isSaving || !content.trim()}
-                className="px-8 py-3 bg-black text-white text-base font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-              >
-                {isSaving ? 'Saving...' : 'Save'}
-              </button>
-
-              {existingEntry && !existingEntry.is_sealed && (
-                <button
-                  onClick={handleSeal}
-                  disabled={isSealing}
-                  className="px-8 py-3 bg-gray-100 text-black text-base font-medium hover:bg-gray-200 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  {isSealing ? 'Sealing...' : 'Seal Forever'}
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-
+      {/* Mensajes de error/éxito */}
       {error && (
-        <div className="mt-4 p-4 bg-red-50 text-red-700 text-sm">
-          {error}
+        <div className="flex-shrink-0 px-6 mb-4">
+          <div className="max-w-4xl mx-auto p-4 bg-red-50 text-red-700 text-sm">
+            {error}
+          </div>
         </div>
       )}
 
       {successMessage && (
-        <div className="mt-4 p-4 bg-green-50 text-green-700 text-sm">
-          {successMessage}
+        <div className="flex-shrink-0 px-6 mb-4">
+          <div className="max-w-4xl mx-auto p-4 bg-green-50 text-green-700 text-sm">
+            {successMessage}
+          </div>
         </div>
       )}
+
+      {/* Área de escritura: texto empieza abajo */}
+      <div className="flex-1 overflow-hidden px-6">
+        <div className="max-w-4xl mx-auto h-full flex flex-col justify-end">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            disabled={isSealed}
+            placeholder="Write your thoughts..."
+            className="w-full p-0 border-none focus:ring-0 focus:outline-none resize-none text-lg leading-relaxed overflow-auto"
+            style={{ fontFamily: 'inherit' }}
+          />
+        </div>
+      </div>
+
+      {/* Botones y contador fijos abajo */}
+      <div className="flex-shrink-0 border-t bg-white px-6 py-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="text-sm text-gray-400">
+            {wordCount} words
+          </div>
+
+          <div className="flex gap-3">
+            {!isSealed && (
+              <>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving || !content.trim()}
+                  className="px-8 py-3 bg-black text-white text-base font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isSaving ? 'Saving...' : 'Save'}
+                </button>
+
+                {existingEntry && !existingEntry.is_sealed && (
+                  <button
+                    onClick={handleSeal}
+                    disabled={isSealing}
+                    className="px-8 py-3 bg-gray-100 text-black text-base font-medium hover:bg-gray-200 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isSealing ? 'Sealing...' : 'Seal Forever'}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

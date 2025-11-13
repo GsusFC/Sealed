@@ -102,15 +102,11 @@ export default function Home() {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-white pt-24">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <Editor
-            fid={user.fid}
-            existingEntry={todayEntry}
-            onSave={handleEntrySaved}
-          />
-        </div>
-      </div>
+      <Editor
+        fid={user.fid}
+        existingEntry={todayEntry}
+        onSave={handleEntrySaved}
+      />
     </>
   );
 }
