@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db-edge';
-
-export const runtime = 'edge';
+import { db } from '@/lib/db';
 
 /**
  * POST /api/seal - Mark an entry as sealed with blockchain transaction hash

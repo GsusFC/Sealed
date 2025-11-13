@@ -48,8 +48,8 @@ export interface VerificationResult {
 
 export class BlockchainClient {
   private contractAddress: `0x${string}`;
-  private publicClient;
-  private walletClient;
+  private publicClient: any;
+  private walletClient: any;
 
   constructor() {
     this.contractAddress = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`) ||
@@ -76,17 +76,17 @@ export class BlockchainClient {
    * Initialize wallet client with browser wallet
    */
   async initWallet() {
-    if (typeof window === 'undefined' || !window.ethereum) {
+    if (typeof window === 'undefined' || !(window as any).ethereum) {
       throw new Error('No Ethereum wallet detected');
     }
 
     this.walletClient = createWalletClient({
       chain: base,
-      transport: custom(window.ethereum),
+      transport: custom((window as any).ethereum),
     });
 
     // Request account access
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
   }
 
   /**
