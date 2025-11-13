@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="256" height="256" rx="64" fill="#1A1A1A"/>
+
+  <!-- Lock body -->
+  <rect x="96" y="124" width="64" height="72" rx="8" fill="#FFFFFF"/>
+
+  <!-- Lock shackle -->
+  <path d="M 112 124 L 112 96 C 112 87.163 119.163 80 128 80 C 136.837 80 144 87.163 144 96 L 144 124"
+        stroke="#FFFFFF"
+        stroke-width="12"
+        stroke-linecap="round"
+        fill="none"/>
+
+  <!-- Keyhole -->
+  <circle cx="128" cy="152" r="8" fill="#1A1A1A"/>
+  <rect x="124" y="152" width="8" height="20" rx="2" fill="#1A1A1A"/>
+
+  <!-- Decorative seal wax drip effect -->
+  <ellipse cx="128" cy="196" rx="32" ry="6" fill="#764BA2" opacity="0.3"/>
+</svg>
