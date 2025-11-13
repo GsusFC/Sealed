@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { blockchain } from '@/lib/blockchain';
 import { formatDate } from '@/lib/utils';
+import { useAuth } from '@/lib/auth-context';
 
 interface Entry {
   id: string;
@@ -27,6 +28,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showSealButton, setShowSealButton] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const { getAuthHeaders } = useAuth();
 
   useEffect(() => {
     if (existingEntry && existingEntry.content) {
@@ -49,7 +51,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
 
           const response = await fetch(endpoint, {
             method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify({
               id: existingEntry?.id,
               fid,
@@ -80,7 +82,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
     }, 30000); // 30 seconds
 
     return () => clearTimeout(autoSaveTimer);
-  }, [content, fid, existingEntry, isSaving, isSealing, onSave]);
+  }, [content, fid, existingEntry, isSaving, isSealing, onSave, getAuthHeaders]);
 
   const wordCount = (content || '').trim().split(/\s+/).filter(Boolean).length;
 
@@ -100,7 +102,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
 
       const response = await fetch(endpoint, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           id: existingEntry?.id,
           fid,
@@ -161,7 +163,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
 
       const response = await fetch('/api/seal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           id: existingEntry.id,
           fid,

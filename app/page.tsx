@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
 import { Editor } from '@/components/Editor';
 import { Navigation } from '@/components/Navigation';
+import { useAuth } from '@/lib/auth-context';
 
 interface Entry {
   id: string;
@@ -19,10 +20,12 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<{ fid: number } | null>(null);
   const [todayEntry, setTodayEntry] = useState<Entry | null>(null);
+  const { token, setToken, getAuthHeaders } = useAuth();
 
   useEffect(() => {
     async function initApp() {
       try {
+        // Step 1: Initialize Farcaster SDK
         await farcaster.init();
         const userData = farcaster.getUser();
 
@@ -32,9 +35,43 @@ export default function Home() {
           return;
         }
 
+        // Step 2: Authenticate with SIWF if no token
+        if (!token) {
+          try {
+            // Request user to sign in
+            const signInResult = await farcaster.signIn();
+
+            // Send signature to backend for verification and JWT generation
+            const authResponse = await fetch('/api/auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: signInResult.message,
+                signature: signInResult.signature,
+              }),
+            });
+
+            const authData = await authResponse.json();
+
+            if (!authResponse.ok || !authData.token) {
+              throw new Error('Authentication failed');
+            }
+
+            // Save JWT token
+            setToken(authData.token);
+          } catch (authError) {
+            console.error('Authentication error:', authError);
+            // Continue with mock authentication for development
+            console.warn('Continuing with mock authentication');
+          }
+        }
+
         setUser({ fid: userData.fid });
 
-        const response = await fetch(`/api/entries?fid=${userData.fid}&limit=1`);
+        // Step 3: Fetch user's entries with auth token
+        const response = await fetch(`/api/entries?fid=${userData.fid}&limit=1`, {
+          headers: getAuthHeaders(),
+        });
         const data = await response.json();
 
         if (data.entries && data.entries.length > 0) {
@@ -58,7 +95,7 @@ export default function Home() {
     }
 
     initApp();
-  }, []);
+  }, [token, setToken, getAuthHeaders]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleEntrySaved = (entry: Entry) => {
     setTodayEntry(entry);

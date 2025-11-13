@@ -1,22 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getAuthenticatedFID } from '@/lib/auth';
 
 /**
  * GET /api/stats - Get user statistics
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const fid = searchParams.get('fid');
+    // Authenticate user
+    const authHeader = request.headers.get('authorization');
+    const authenticatedFID = await getAuthenticatedFID(authHeader);
 
-    if (!fid) {
+    if (!authenticatedFID) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid or missing token' },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const requestedFID = searchParams.get('fid');
+
+    if (!requestedFID) {
       return NextResponse.json(
         { error: 'Missing fid parameter' },
         { status: 400 }
       );
     }
 
-    const stats = await db.getStats(parseInt(fid));
+    // Verify user can only access their own stats
+    if (authenticatedFID !== parseInt(requestedFID)) {
+      return NextResponse.json(
+        { error: 'Forbidden - Cannot access other users stats' },
+        { status: 403 }
+      );
+    }
+
+    const stats = await db.getStats(authenticatedFID);
 
     return NextResponse.json({
       totalEntries: Number(stats.total_entries) || 0,

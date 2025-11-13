@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getAuthenticatedFID } from '@/lib/auth';
 
 /**
  * POST /api/seal - Mark an entry as sealed with blockchain transaction hash
  */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
+    const authHeader = request.headers.get('authorization');
+    const authenticatedFID = await getAuthenticatedFID(authHeader);
+
+    if (!authenticatedFID) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid or missing token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { id, fid, txHash, contentHash } = body;
 
@@ -13,6 +25,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      );
+    }
+
+    // Verify user can only seal their own entries
+    if (authenticatedFID !== fid) {
+      return NextResponse.json(
+        { error: 'Forbidden - Cannot seal other users entries' },
+        { status: 403 }
       );
     }
 

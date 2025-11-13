@@ -1,24 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getAuthenticatedFID } from '@/lib/auth';
 
 /**
  * GET /api/entries - Get all entries for a user
  */
 export async function GET(request: NextRequest) {
   try {
+    // Authenticate user
+    const authHeader = request.headers.get('authorization');
+    const authenticatedFID = await getAuthenticatedFID(authHeader);
+
+    if (!authenticatedFID) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid or missing token' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
-    const fid = searchParams.get('fid');
+    const requestedFID = searchParams.get('fid');
     const limit = searchParams.get('limit');
 
-    if (!fid) {
+    if (!requestedFID) {
       return NextResponse.json(
         { error: 'Missing fid parameter' },
         { status: 400 }
       );
     }
 
+    // Verify user can only access their own entries
+    if (authenticatedFID !== parseInt(requestedFID)) {
+      return NextResponse.json(
+        { error: 'Forbidden - Cannot access other users entries' },
+        { status: 403 }
+      );
+    }
+
     const entries = await db.getEntries(
-      parseInt(fid),
+      authenticatedFID,
       limit ? parseInt(limit) : 30
     );
 
@@ -37,6 +57,17 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
+    const authHeader = request.headers.get('authorization');
+    const authenticatedFID = await getAuthenticatedFID(authHeader);
+
+    if (!authenticatedFID) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid or missing token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { fid, content, mood } = body;
 
@@ -44,6 +75,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      );
+    }
+
+    // Verify user can only create entries for themselves
+    if (authenticatedFID !== fid) {
+      return NextResponse.json(
+        { error: 'Forbidden - Cannot create entries for other users' },
+        { status: 403 }
       );
     }
 
@@ -71,6 +110,17 @@ export async function POST(request: NextRequest) {
  */
 export async function PUT(request: NextRequest) {
   try {
+    // Authenticate user
+    const authHeader = request.headers.get('authorization');
+    const authenticatedFID = await getAuthenticatedFID(authHeader);
+
+    if (!authenticatedFID) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid or missing token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { id, fid, content, mood } = body;
 
@@ -78,6 +128,14 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      );
+    }
+
+    // Verify user can only update their own entries
+    if (authenticatedFID !== fid) {
+      return NextResponse.json(
+        { error: 'Forbidden - Cannot update other users entries' },
+        { status: 403 }
       );
     }
 
