@@ -38,7 +38,7 @@ export default function ArchivePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <div className="animate-spin h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -70,17 +70,18 @@ export default function ArchivePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <header className="mb-12">
-          <h1 className="text-2xl font-semibold mb-1">Archive</h1>
-          <p className="text-gray-500 text-sm">Your past entries</p>
-        </header>
-
-        <Archive fid={user.fid} />
-      </div>
-
+    <>
       <Navigation />
-    </div>
+      <div className="min-h-screen bg-white pt-24">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <header className="mb-12">
+            <h1 className="text-2xl font-semibold mb-1">Archive</h1>
+            <p className="text-gray-500 text-sm">Your past entries</p>
+          </header>
+
+          <Archive fid={user.fid} />
+        </div>
+      </div>
+    </>
   );
 }

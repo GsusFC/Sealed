@@ -46,32 +46,32 @@ export function Stats({ fid }: StatsProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white border border-gray-200 p-6">
       <h3 className="text-lg font-semibold mb-4">Your Stats</h3>
       <div className="grid grid-cols-2 gap-4">
-        <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="text-center p-4 bg-gray-50">
+          <div className="text-2xl font-bold text-black">
             {formatNumber(stats.totalEntries)}
           </div>
           <div className="text-sm text-gray-600 mt-1">Total Entries</div>
         </div>
 
-        <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="text-center p-4 bg-gray-50">
+          <div className="text-2xl font-bold text-black">
             {formatNumber(stats.sealedEntries)}
           </div>
           <div className="text-sm text-gray-600 mt-1">Sealed</div>
         </div>
 
-        <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="text-center p-4 bg-gray-50">
+          <div className="text-2xl font-bold text-black">
             {formatNumber(stats.totalWords)}
           </div>
           <div className="text-sm text-gray-600 mt-1">Words Written</div>
         </div>
 
-        <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="text-center p-4 bg-gray-50">
+          <div className="text-2xl font-bold text-black">
             {stats.totalEntries > 0
               ? Math.round(stats.totalWords / stats.totalEntries)
               : 0}

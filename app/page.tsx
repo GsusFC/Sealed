@@ -34,7 +34,6 @@ export default function Home() {
 
         setUser({ fid: userData.fid });
 
-        // Fetch today's entry
         const response = await fetch(`/api/entries?fid=${userData.fid}&limit=1`);
         const data = await response.json();
 
@@ -69,7 +68,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <div className="animate-spin h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -101,21 +100,17 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <header className="mb-12">
-          <h1 className="text-2xl font-semibold mb-1">Sealed</h1>
-          <p className="text-gray-500 text-sm">Your thoughts, sealed forever</p>
-        </header>
-
-        <Editor
-          fid={user.fid}
-          existingEntry={todayEntry}
-          onSave={handleEntrySaved}
-        />
-      </div>
-
+    <>
       <Navigation />
-    </div>
+      <div className="min-h-screen bg-white pt-24">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <Editor
+            fid={user.fid}
+            existingEntry={todayEntry}
+            onSave={handleEntrySaved}
+          />
+        </div>
+      </div>
+    </>
   );
 }

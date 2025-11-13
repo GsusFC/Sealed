@@ -33,7 +33,6 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   }, [existingEntry]);
 
   const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
-  const charCount = content.length;
 
   const handleSave = async () => {
     if (!content.trim()) {
@@ -46,7 +45,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
     setSuccessMessage(null);
 
     try {
-      const endpoint = existingEntry ? '/api/entries' : '/api/entries';
+      const endpoint = '/api/entries';
       const method = existingEntry ? 'PUT' : 'POST';
 
       const response = await fetch(endpoint, {
@@ -101,17 +100,14 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
     setSuccessMessage(null);
 
     try {
-      // Generate content hash
       const contentHash = blockchain.generateContentHash(content);
 
-      // Seal on blockchain
       const txHash = await blockchain.sealEntry({
         fid,
         content,
         wordCount,
       });
 
-      // Update database
       const response = await fetch('/api/seal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,7 +145,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const isSealed = existingEntry?.is_sealed || false;
 
   return (
-    <div className="w-full">
+    <div className="w-full pb-32">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-lg text-gray-500">
@@ -172,7 +168,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
         style={{ fontFamily: 'inherit' }}
       />
 
-      <div className="mt-8 flex items-center justify-between border-t pt-4">
+      <div className="mt-8 flex items-center justify-between border-t pt-6 pb-6">
         <div className="text-sm text-gray-400">
           {wordCount} words
         </div>
@@ -183,7 +179,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
               <button
                 onClick={handleSave}
                 disabled={isSaving || !content.trim()}
-                className="px-5 py-2 bg-black text-white text-sm rounded hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="px-8 py-3 bg-black text-white text-base font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
                 {isSaving ? 'Saving...' : 'Save'}
               </button>
@@ -192,7 +188,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
                 <button
                   onClick={handleSeal}
                   disabled={isSealing}
-                  className="px-5 py-2 bg-gray-100 text-black text-sm rounded hover:bg-gray-200 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className="px-8 py-3 bg-gray-100 text-black text-base font-medium hover:bg-gray-200 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   {isSealing ? 'Sealing...' : 'Seal Forever'}
                 </button>
@@ -203,13 +199,13 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
       </div>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-50 text-red-700 rounded text-sm">
+        <div className="mt-4 p-4 bg-red-50 text-red-700 text-sm">
           {error}
         </div>
       )}
 
       {successMessage && (
-        <div className="mt-4 p-3 bg-green-50 text-green-700 rounded text-sm">
+        <div className="mt-4 p-4 bg-green-50 text-green-700 text-sm">
           {successMessage}
         </div>
       )}

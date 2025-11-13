@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatDate, getMoodEmoji } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 
 interface Entry {
   id: string;
@@ -45,14 +45,14 @@ export function Archive({ fid }: ArchiveProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="animate-spin h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+      <div className="bg-red-50 text-red-700 p-4">
         {error}
       </div>
     );
@@ -73,26 +73,23 @@ export function Archive({ fid }: ArchiveProps) {
       {entries.map((entry) => (
         <div
           key={entry.id}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 entry-card hover:shadow-md transition-shadow cursor-pointer"
+          className="bg-white border border-gray-200 p-6 entry-card hover:border-gray-400 transition-colors cursor-pointer"
         >
           <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">{getMoodEmoji(entry.mood)}</span>
-              <div>
-                <h3 className="font-semibold">{formatDate(entry.date)}</h3>
-                <p className="text-sm text-gray-600">
-                  {entry.word_count} words
-                </p>
-              </div>
+            <div>
+              <h3 className="font-semibold">{formatDate(entry.date)}</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {entry.word_count} words
+              </p>
             </div>
             {entry.is_sealed && (
-              <span className="sealed-badge">
-                🔒 Sealed
+              <span className="text-sm text-gray-400">
+                Sealed
               </span>
             )}
           </div>
 
-          <p className="text-gray-700 line-clamp-3">
+          <p className="text-gray-700 line-clamp-3 leading-relaxed">
             {entry.excerpt}
           </p>
         </div>
