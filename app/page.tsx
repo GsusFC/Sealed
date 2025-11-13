@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
 import { Editor } from '@/components/Editor';
 import { Navigation } from '@/components/Navigation';
-import { Stats } from '@/components/Stats';
 
 interface Entry {
   id: string;
@@ -68,7 +67,7 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -79,7 +78,7 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
@@ -91,7 +90,7 @@ export default function Home() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="text-6xl mb-4">🔒</div>
           <h1 className="text-2xl font-bold mb-2">Not authenticated</h1>
@@ -102,22 +101,18 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Sealed</h1>
-          <p className="text-gray-600">Your thoughts, sealed forever</p>
+    <div className="min-h-screen bg-white pb-20">
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        <header className="mb-12">
+          <h1 className="text-2xl font-semibold mb-1">Sealed</h1>
+          <p className="text-gray-500 text-sm">Your thoughts, sealed forever</p>
         </header>
 
-        <Stats fid={user.fid} />
-
-        <div className="mt-8">
-          <Editor
-            fid={user.fid}
-            existingEntry={todayEntry}
-            onSave={handleEntrySaved}
-          />
-        </div>
+        <Editor
+          fid={user.fid}
+          existingEntry={todayEntry}
+          onSave={handleEntrySaved}
+        />
       </div>
 
       <Navigation />

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
-import { Archive } from '@/components/Archive';
+import { Stats } from '@/components/Stats';
 import { Navigation } from '@/components/Navigation';
 
-export default function ArchivePage() {
+export default function StatsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<{ fid: number } | null>(null);
@@ -73,11 +73,11 @@ export default function ArchivePage() {
     <div className="min-h-screen bg-white pb-20">
       <div className="max-w-4xl mx-auto px-6 py-8">
         <header className="mb-12">
-          <h1 className="text-2xl font-semibold mb-1">Archive</h1>
-          <p className="text-gray-500 text-sm">Your past entries</p>
+          <h1 className="text-2xl font-semibold mb-1">Stats</h1>
+          <p className="text-gray-500 text-sm">Your writing statistics</p>
         </header>
 
-        <Archive fid={user.fid} />
+        <Stats fid={user.fid} />
       </div>
 
       <Navigation />

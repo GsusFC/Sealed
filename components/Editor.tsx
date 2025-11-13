@@ -19,20 +19,8 @@ interface EditorProps {
   onSave: (entry: Entry) => void;
 }
 
-const moods = [
-  { value: 'happy', emoji: '😊', label: 'Happy' },
-  { value: 'sad', emoji: '😢', label: 'Sad' },
-  { value: 'excited', emoji: '🎉', label: 'Excited' },
-  { value: 'calm', emoji: '😌', label: 'Calm' },
-  { value: 'anxious', emoji: '😰', label: 'Anxious' },
-  { value: 'grateful', emoji: '🙏', label: 'Grateful' },
-  { value: 'thoughtful', emoji: '🤔', label: 'Thoughtful' },
-  { value: 'creative', emoji: '🎨', label: 'Creative' },
-];
-
 export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const [content, setContent] = useState('');
-  const [mood, setMood] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [isSealing, setIsSealing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +29,6 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   useEffect(() => {
     if (existingEntry) {
       setContent(existingEntry.content);
-      setMood(existingEntry.mood || '');
     }
   }, [existingEntry]);
 
@@ -69,7 +56,6 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
           id: existingEntry?.id,
           fid,
           content,
-          mood: mood || undefined,
         }),
       });
 
@@ -79,12 +65,11 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
         throw new Error(data.error || 'Failed to save entry');
       }
 
-      setSuccessMessage('Entry saved successfully!');
+      setSuccessMessage('Saved');
 
       const savedEntry: Entry = {
         id: existingEntry?.id || data.id,
         content,
-        mood,
         date: Date.now(),
         word_count: wordCount,
         is_sealed: false,
@@ -92,7 +77,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
 
       onSave(savedEntry);
 
-      setTimeout(() => setSuccessMessage(null), 3000);
+      setTimeout(() => setSuccessMessage(null), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save entry');
     } finally {
@@ -124,7 +109,6 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
         fid,
         content,
         wordCount,
-        mood,
       });
 
       // Update database
@@ -145,7 +129,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
         throw new Error(data.error || 'Failed to seal entry');
       }
 
-      setSuccessMessage('Entry sealed forever! 🔒');
+      setSuccessMessage('Entry sealed forever');
 
       const sealedEntry: Entry = {
         ...existingEntry,
@@ -165,36 +149,18 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const isSealed = existingEntry?.is_sealed || false;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-semibold">
+    <div className="w-full">
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-lg text-gray-500">
             {formatDate(existingEntry?.date || Date.now())}
           </h2>
           {isSealed && (
-            <span className="sealed-badge">
-              🔒 Sealed
+            <span className="text-sm text-gray-400">
+              Sealed
             </span>
           )}
         </div>
-
-        {!isSealed && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {moods.map((m) => (
-              <button
-                key={m.value}
-                onClick={() => setMood(m.value)}
-                className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                  mood === m.value
-                    ? 'bg-purple-100 text-purple-700 border-2 border-purple-500'
-                    : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200'
-                }`}
-              >
-                {m.emoji} {m.label}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       <textarea
@@ -202,21 +168,22 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
         onChange={(e) => setContent(e.target.value)}
         disabled={isSealed}
         placeholder="Write your thoughts..."
-        className="w-full min-h-[300px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none editor-textarea"
+        className="w-full min-h-[500px] p-0 border-none focus:ring-0 focus:outline-none resize-none text-lg leading-relaxed"
+        style={{ fontFamily: 'inherit' }}
       />
 
-      <div className="mt-4 flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          {wordCount} words · {charCount} characters
+      <div className="mt-8 flex items-center justify-between border-t pt-4">
+        <div className="text-sm text-gray-400">
+          {wordCount} words
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           {!isSealed && (
             <>
               <button
                 onClick={handleSave}
                 disabled={isSaving || !content.trim()}
-                className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                className="px-5 py-2 bg-black text-white text-sm rounded hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
                 {isSaving ? 'Saving...' : 'Save'}
               </button>
@@ -225,9 +192,9 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
                 <button
                   onClick={handleSeal}
                   disabled={isSealing}
-                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-400 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2 bg-gray-100 text-black text-sm rounded hover:bg-gray-200 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
-                  {isSealing ? 'Sealing...' : '🔒 Seal Forever'}
+                  {isSealing ? 'Sealing...' : 'Seal Forever'}
                 </button>
               )}
             </>
@@ -236,13 +203,13 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
       </div>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+        <div className="mt-4 p-3 bg-red-50 text-red-700 rounded text-sm">
           {error}
         </div>
       )}
 
       {successMessage && (
-        <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">
+        <div className="mt-4 p-3 bg-green-50 text-green-700 rounded text-sm">
           {successMessage}
         </div>
       )}
