@@ -25,6 +25,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const [isSealing, setIsSealing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showSealButton, setShowSealButton] = useState(false);
 
   useEffect(() => {
     if (existingEntry && existingEntry.content) {
@@ -65,6 +66,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
       }
 
       setSuccessMessage('Saved');
+      setShowSealButton(true);
 
       const savedEntry: Entry = {
         id: existingEntry?.id || data.id,
@@ -209,7 +211,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
                   {isSaving ? 'Saving...' : 'Save'}
                 </button>
 
-                {existingEntry && !existingEntry.is_sealed && (
+                {showSealButton && existingEntry && !existingEntry.is_sealed && (
                   <button
                     onClick={handleSeal}
                     disabled={isSealing}
