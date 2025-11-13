@@ -27,15 +27,15 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (existingEntry) {
+    if (existingEntry && existingEntry.content) {
       setContent(existingEntry.content);
     }
   }, [existingEntry]);
 
-  const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
+  const wordCount = (content || '').trim().split(/\s+/).filter(Boolean).length;
 
   const handleSave = async () => {
-    if (!content.trim()) {
+    if (!content || !content.trim()) {
       setError('Please write something before saving');
       return;
     }
@@ -203,7 +203,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
               <>
                 <button
                   onClick={handleSave}
-                  disabled={isSaving || !content.trim()}
+                  disabled={isSaving || !content || !content.trim()}
                   className="px-8 py-3 bg-black text-white text-base font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   {isSaving ? 'Saving...' : 'Save'}
