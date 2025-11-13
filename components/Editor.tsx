@@ -26,12 +26,61 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showSealButton, setShowSealButton] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
 
   useEffect(() => {
     if (existingEntry && existingEntry.content) {
       setContent(existingEntry.content);
     }
   }, [existingEntry]);
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!content || !content.trim() || !fid) return;
+
+    // Auto-save after 30 seconds of no changes
+    const autoSaveTimer = setTimeout(async () => {
+      if (content.trim() && !isSaving && !isSealing) {
+        setIsAutoSaving(true);
+
+        try {
+          const endpoint = '/api/entries';
+          const method = existingEntry ? 'PUT' : 'POST';
+
+          const response = await fetch(endpoint, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: existingEntry?.id,
+              fid,
+              content,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            const savedEntry: Entry = {
+              id: existingEntry?.id || data.id,
+              content,
+              date: Date.now(),
+              word_count: (content || '').trim().split(/\s+/).filter(Boolean).length,
+              is_sealed: false,
+            };
+
+            onSave(savedEntry);
+            setShowSealButton(true);
+          }
+        } catch (err) {
+          console.error('Auto-save failed:', err);
+        } finally {
+          setIsAutoSaving(false);
+        }
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearTimeout(autoSaveTimer);
+  }, [content, fid, existingEntry, isSaving, isSealing, onSave]);
 
   const wordCount = (content || '').trim().split(/\s+/).filter(Boolean).length;
 
@@ -198,6 +247,7 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="text-sm text-gray-400">
             {wordCount} words
+            {isAutoSaving && <span className="ml-2 text-gray-500">• auto-saving...</span>}
           </div>
 
           <div className="flex gap-3">

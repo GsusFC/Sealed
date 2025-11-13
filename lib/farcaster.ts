@@ -1,20 +1,11 @@
-// Farcaster Mini App SDK integration
-// Note: The actual SDK may differ - this is a reference implementation
+// Farcaster Mini App SDK integration with Quick Auth
+import { sdk } from '@farcaster/miniapp-sdk';
 
 export interface FarcasterUser {
   fid: number;
   username?: string;
   displayName?: string;
   pfpUrl?: string;
-}
-
-interface MiniAppContext {
-  user?: {
-    fid: number;
-    username?: string;
-    displayName?: string;
-    pfpUrl?: string;
-  };
 }
 
 export class FarcasterClient {
@@ -35,41 +26,28 @@ export class FarcasterClient {
     if (this.isReady) return;
 
     try {
-      // Check if running in Farcaster environment
-      if (typeof window !== 'undefined' && (window as any).farcaster) {
-        const miniapp = (window as any).farcaster;
-        
-        // Initialize Farcaster Mini App SDK
-        if (miniapp.init) {
-          await miniapp.init();
-        }
+      // Get Farcaster context from the SDK
+      const context = await sdk.context;
+
+      if (context?.user) {
+        this.user = {
+          fid: context.user.fid,
+          username: context.user.username,
+          displayName: context.user.displayName,
+          pfpUrl: context.user.pfpUrl,
+        };
         this.isReady = true;
 
-        // Get user context
-        if (miniapp.getContext) {
-          const context: MiniAppContext = await miniapp.getContext();
-          if (context?.user) {
-            this.user = {
-              fid: context.user.fid,
-              username: context.user.username,
-              displayName: context.user.displayName,
-              pfpUrl: context.user.pfpUrl,
-            };
-          }
-        }
+        // Let Farcaster know the app is ready
+        sdk.actions.ready();
       } else {
-        // For development/testing outside Farcaster
-        console.warn('Running outside Farcaster environment. Using mock data.');
-        this.isReady = true;
-        this.user = {
-          fid: 12345, // Mock FID for development
-          username: 'testuser',
-          displayName: 'Test User',
-        };
+        throw new Error('No user context available');
       }
     } catch (error) {
       console.error('Failed to initialize Farcaster SDK:', error);
-      // Don't throw - allow app to work in degraded mode
+      console.warn('Running outside Farcaster environment. Using mock data.');
+
+      // Fallback to mock data for development
       this.isReady = true;
       this.user = {
         fid: 12345, // Mock FID for development
@@ -87,23 +65,23 @@ export class FarcasterClient {
     return this.isReady;
   }
 
-  async requestSignature(message: string): Promise<string> {
+  async signIn(): Promise<{ message: string; signature: string }> {
     if (!this.isReady) {
       throw new Error('Farcaster SDK not initialized');
     }
 
     try {
-      if (typeof window !== 'undefined' && (window as any).farcaster?.requestSignature) {
-        const signature = await (window as any).farcaster.requestSignature({
-          message,
-        });
-        return signature;
-      }
-      
-      // Mock signature for development
-      return '0x' + 'mock_signature';
+      // Generate a random nonce (at least 8 alphanumeric characters)
+      const nonce = Math.random().toString(36).substring(2, 15);
+
+      const signInResult = await sdk.actions.signIn({
+        nonce,
+        acceptAuthAddress: true,
+      });
+
+      return signInResult;
     } catch (error) {
-      console.error('Failed to request signature:', error);
+      console.error('Failed to sign in:', error);
       throw error;
     }
   }
@@ -114,35 +92,36 @@ export class FarcasterClient {
     }
 
     try {
-      if (typeof window !== 'undefined' && (window as any).farcaster?.openUrl) {
-        await (window as any).farcaster.openUrl(url);
-      } else {
-        window.open(url, '_blank');
-      }
+      await sdk.actions.openUrl(url);
     } catch (error) {
       console.error('Failed to open URL:', error);
-      throw error;
+      // Fallback to window.open
+      if (typeof window !== 'undefined') {
+        window.open(url, '_blank');
+      }
     }
   }
 
-  async shareContent(text: string): Promise<void> {
+  async shareContent(): Promise<void> {
     if (!this.isReady) {
       throw new Error('Farcaster SDK not initialized');
     }
 
     try {
-      if (typeof window !== 'undefined' && (window as any).farcaster?.share) {
-        await (window as any).farcaster.share({ text });
-      } else {
-        // Fallback: copy to clipboard
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(text);
-          console.log('Content copied to clipboard');
-        }
-      }
+      // Add the Mini App to the user's feed
+      await sdk.actions.addMiniApp();
     } catch (error) {
-      console.error('Failed to share content:', error);
+      console.error('Failed to share Mini App:', error);
       throw error;
+    }
+  }
+
+  // Close the mini app
+  async close(): Promise<void> {
+    try {
+      await sdk.actions.close();
+    } catch (error) {
+      console.error('Failed to close mini app:', error);
     }
   }
 }
