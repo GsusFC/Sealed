@@ -61,8 +61,25 @@ export default function Home() {
             setToken(authData.token);
           } catch (authError) {
             console.error('Authentication error:', authError);
-            // Continue with mock authentication for development
-            console.warn('Continuing with mock authentication');
+            console.warn('Generating mock token for development');
+
+            // Generate a mock token for development
+            try {
+              const mockAuthResponse = await fetch('/api/auth/mock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  fid: userData.fid,
+                }),
+              });
+
+              if (mockAuthResponse.ok) {
+                const mockData = await mockAuthResponse.json();
+                setToken(mockData.token);
+              }
+            } catch (mockError) {
+              console.error('Mock auth also failed:', mockError);
+            }
           }
         }
 
