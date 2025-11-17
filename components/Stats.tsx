@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatNumber } from '@/lib/utils';
+import { useAuth } from '@/lib/auth-context';
 
 interface StatsData {
   totalEntries: number;
@@ -17,11 +18,14 @@ interface StatsProps {
 export function Stats({ fid }: StatsProps) {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { getAuthHeaders } = useAuth();
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await fetch(`/api/stats?fid=${fid}`);
+        const response = await fetch(`/api/stats?fid=${fid}`, {
+          headers: getAuthHeaders(),
+        });
         const data = await response.json();
 
         if (response.ok) {
@@ -35,7 +39,7 @@ export function Stats({ fid }: StatsProps) {
     }
 
     fetchStats();
-  }, [fid]);
+  }, [fid, getAuthHeaders]);
 
   if (isLoading) {
     return null;

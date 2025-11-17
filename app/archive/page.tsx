@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
 import { Archive } from '@/components/Archive';
 import { Navigation } from '@/components/Navigation';
+import { useAuth } from '@/lib/auth-context';
 
 export default function ArchivePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<{ fid: number } | null>(null);
+  const { token, setToken } = useAuth();
 
   useEffect(() => {
     async function initApp() {
@@ -22,6 +24,42 @@ export default function ArchivePage() {
           return;
         }
 
+        // Authenticate if no token
+        if (!token) {
+          try {
+            const signInResult = await farcaster.signIn();
+            const authResponse = await fetch('/api/auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: signInResult.message,
+                signature: signInResult.signature,
+              }),
+            });
+
+            const authData = await authResponse.json();
+            if (authResponse.ok && authData.token) {
+              setToken(authData.token);
+            }
+          } catch (authError) {
+            console.error('Authentication error:', authError);
+            // Try mock token for development
+            try {
+              const mockAuthResponse = await fetch('/api/auth/mock', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fid: userData.fid }),
+              });
+              if (mockAuthResponse.ok) {
+                const mockData = await mockAuthResponse.json();
+                setToken(mockData.token);
+              }
+            } catch (mockError) {
+              console.error('Mock auth also failed:', mockError);
+            }
+          }
+        }
+
         setUser({ fid: userData.fid });
         setIsLoading(false);
       } catch (err) {
@@ -32,7 +70,7 @@ export default function ArchivePage() {
     }
 
     initApp();
-  }, []);
+  }, [token, setToken]);
 
   if (isLoading) {
     return (

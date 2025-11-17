@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { formatDate } from '@/lib/utils';
+import { useAuth } from '@/lib/auth-context';
 
 interface Entry {
   id: string;
+  excerpt: string;
   mood?: string;
   date: number;
   word_count: number;
   is_sealed: boolean;
-  excerpt: string;
 }
 
 interface ArchiveProps {
@@ -20,11 +21,14 @@ export function Archive({ fid }: ArchiveProps) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { getAuthHeaders } = useAuth();
 
   useEffect(() => {
     async function fetchEntries() {
       try {
-        const response = await fetch(`/api/entries?fid=${fid}&limit=50`);
+        const response = await fetch(`/api/entries?fid=${fid}&limit=50`, {
+          headers: getAuthHeaders(),
+        });
         const data = await response.json();
 
         if (!response.ok) {
@@ -40,7 +44,7 @@ export function Archive({ fid }: ArchiveProps) {
     }
 
     fetchEntries();
-  }, [fid]);
+  }, [fid, getAuthHeaders]);
 
   if (isLoading) {
     return (
