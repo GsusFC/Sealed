@@ -37,12 +37,14 @@ export async function GET(request: NextRequest) {
     }
 
     const stats = await db.getStats(authenticatedFID);
+    const currentStreak = await db.getCurrentStreak(authenticatedFID);
 
     return NextResponse.json({
       totalEntries: Number(stats.total_entries) || 0,
       totalWords: Number(stats.total_words) || 0,
       totalChars: Number(stats.total_chars) || 0,
       sealedEntries: Number(stats.sealed_entries) || 0,
+      currentStreak: currentStreak,
     });
   } catch (error) {
     console.error('Error fetching stats:', error);
