@@ -1,26 +1,21 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
 import { Settings } from '@/components/Settings';
 import { Navigation } from '@/components/Navigation';
+import { Header } from '@/components/Header';
 import { useAuth } from '@/lib/auth-context';
+import { useTheme } from '@/lib/theme-context';
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<{ fid: number; username?: string } | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const { token, setToken } = useAuth();
-
-  useEffect(() => {
-    // Load theme from localStorage
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-    }
-  }, []);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     async function initApp() {
@@ -82,13 +77,6 @@ export default function SettingsPage() {
     initApp();
   }, [token, setToken]);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -125,16 +113,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <Header charCount={0} showCharCount={false} />
       <Navigation />
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-        <Settings
-          toggleTheme={toggleTheme}
-          currentTheme={theme}
-          username={user.username}
-          walletAddress={undefined}
-        />
-      </div>
-    </>
+      <Settings
+        toggleTheme={toggleTheme}
+        currentTheme={theme}
+        username={user.username}
+        walletAddress={undefined}
+      />
+    </div>
   );
 }
