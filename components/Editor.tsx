@@ -198,16 +198,16 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
   const isSealed = existingEntry?.is_sealed || false;
 
   return (
-    <div className="fixed inset-0 pt-24 flex flex-col bg-white">
+    <div className="fixed inset-0 pt-24 flex flex-col bg-cyber-bg">
       {/* Header arriba */}
-      <div className="flex-shrink-0 px-6 py-4">
+      <div className="flex-shrink-0 px-6 py-4 border-b border-cyber-border">
         <div className="flex items-center justify-between max-w-4xl mx-auto">
-          <h2 className="text-lg text-gray-500">
-            {formatDate(existingEntry?.date || Date.now())}
+          <h2 className="text-sm text-slate terminal-text">
+            {formatDate(existingEntry?.date || Date.now()).toUpperCase()}
           </h2>
           {isSealed && (
-            <span className="text-sm text-gray-400">
-              Sealed
+            <span className="sealed-badge">
+              [ SEALED ]
             </span>
           )}
         </div>
@@ -216,16 +216,16 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
       {/* Mensajes de error/éxito */}
       {error && (
         <div className="flex-shrink-0 px-6 mb-4">
-          <div className="max-w-4xl mx-auto p-4 bg-red-50 text-red-700 text-sm">
-            {error}
+          <div className="max-w-4xl mx-auto p-4 border border-red-500/30 bg-red-950/20 text-red-400 text-xs font-mono terminal-text">
+            [ ERROR ] {error}
           </div>
         </div>
       )}
 
       {successMessage && (
         <div className="flex-shrink-0 px-6 mb-4">
-          <div className="max-w-4xl mx-auto p-4 bg-green-50 text-green-700 text-sm">
-            {successMessage}
+          <div className="max-w-4xl mx-auto p-4 border border-violet/30 bg-void/20 text-violet text-xs font-mono terminal-text">
+            [ SUCCESS ] {successMessage}
           </div>
         </div>
       )}
@@ -237,19 +237,18 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             disabled={isSealed}
-            placeholder="Write your thoughts..."
-            className="w-full p-0 border-none focus:ring-0 focus:outline-none resize-none text-lg leading-relaxed overflow-auto"
-            style={{ fontFamily: 'inherit' }}
+            placeholder="INITIATE ENTRY..."
+            className="editor-textarea w-full p-0 border-none focus:ring-0 focus:outline-none resize-none text-base leading-relaxed overflow-auto text-foreground bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
       </div>
 
       {/* Botones y contador fijos abajo */}
-      <div className="flex-shrink-0 border-t bg-white px-6 py-6">
+      <div className="flex-shrink-0 border-t border-cyber-border bg-cyber-bg px-6 py-6">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="text-sm text-gray-400">
-            {wordCount} words
-            {isAutoSaving && <span className="ml-2 text-gray-500">• auto-saving...</span>}
+          <div className="text-xs text-slate font-mono terminal-text">
+            {wordCount} WORDS
+            {isAutoSaving && <span className="ml-3 text-violet">[ AUTO-SAVING... ]</span>}
           </div>
 
           <div className="flex gap-3">
@@ -258,18 +257,18 @@ export function Editor({ fid, existingEntry, onSave }: EditorProps) {
                 <button
                   onClick={handleSave}
                   disabled={isSaving || !content || !content.trim()}
-                  className="px-8 py-3 bg-black text-white text-base font-medium hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className="btn-terminal-primary disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? '[ SAVING... ]' : '[ SAVE ]'}
                 </button>
 
                 {showSealButton && existingEntry && !existingEntry.is_sealed && (
                   <button
                     onClick={handleSeal}
                     disabled={isSealing}
-                    className="px-8 py-3 bg-gray-100 text-black text-base font-medium hover:bg-gray-200 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    className="btn-terminal disabled:opacity-30 disabled:cursor-not-allowed glow-on-hover"
                   >
-                    {isSealing ? 'Sealing...' : 'Seal Forever'}
+                    {isSealing ? '[ SEALING... ]' : '[ SEAL FOREVER ]'}
                   </button>
                 )}
               </>
