@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
 import { Stats } from '@/components/Stats';
 import { Navigation } from '@/components/Navigation';
+import { Header } from '@/components/Header';
 import { useAuth } from '@/lib/auth-context';
 
 export default function StatsPage() {
@@ -74,10 +75,10 @@ export default function StatsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cyber-bg">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-violet mx-auto"></div>
-          <p className="mt-4 text-slate font-mono terminal-text text-xs">[ LOADING... ]</p>
+          <div className="animate-spin h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
+          <p className="mt-4 text-slate-500 font-mono text-xs">[ LOADING... ]</p>
         </div>
       </div>
     );
@@ -85,11 +86,11 @@ export default function StatsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cyber-bg">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="text-6xl mb-4 font-mono text-red-400">!</div>
-          <h1 className="text-xl font-mono terminal-text text-violet mb-2">[ ERROR ]</h1>
-          <p className="text-slate text-sm font-mono">{error}</p>
+          <h1 className="text-xl font-mono text-violet-600 mb-2">[ ERROR ]</h1>
+          <p className="text-slate-500 text-sm font-mono">{error}</p>
         </div>
       </div>
     );
@@ -97,29 +98,21 @@ export default function StatsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cyber-bg">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-6xl mb-4 font-mono text-violet">🔒</div>
-          <h1 className="text-xl font-mono terminal-text text-violet mb-2">[ UNAUTHORIZED ]</h1>
-          <p className="text-slate text-sm font-mono">Please open this app from Warpcast</p>
+          <div className="text-6xl mb-4 font-mono text-violet-600">🔒</div>
+          <h1 className="text-xl font-mono text-violet-600 mb-2">[ UNAUTHORIZED ]</h1>
+          <p className="text-slate-500 text-sm font-mono">Please open this app from Warpcast</p>
         </div>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <Header charCount={0} showCharCount={false} />
       <Navigation />
-      <div className="min-h-screen bg-cyber-bg pt-24">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <header className="mb-12 border-b border-cyber-border pb-6">
-            <h1 className="text-xl font-mono terminal-text text-violet mb-2">[ STATS ]</h1>
-            <p className="text-slate text-xs font-mono">Writing Metrics — Performance Analysis</p>
-          </header>
-
-          <Stats fid={user.fid} />
-        </div>
-      </div>
-    </>
+      <Stats fid={user.fid} />
+    </div>
   );
 }

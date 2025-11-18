@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
 import { Editor } from '@/components/Editor';
 import { Navigation } from '@/components/Navigation';
+import { Header } from '@/components/Header';
 import { useAuth } from '@/lib/auth-context';
 
 interface Entry {
@@ -20,6 +21,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<{ fid: number } | null>(null);
   const [todayEntry, setTodayEntry] = useState<Entry | null>(null);
+  const [charCount, setCharCount] = useState(0);
   const { token, setToken, getAuthHeaders } = useAuth();
 
   useEffect(() => {
@@ -118,12 +120,16 @@ export default function Home() {
     setTodayEntry(entry);
   };
 
+  const handleTextChange = (text: string) => {
+    setCharCount(text.length);
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
+          <p className="mt-4 text-slate-500 font-mono text-xs">[ LOADING... ]</p>
         </div>
       </div>
     );
@@ -131,11 +137,11 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
-          <p className="text-gray-600">{error}</p>
+          <div className="text-6xl mb-4 font-mono text-red-400">!</div>
+          <h1 className="text-xl font-mono text-violet-600 mb-2">[ ERROR ]</h1>
+          <p className="text-slate-500 text-sm font-mono">{error}</p>
         </div>
       </div>
     );
@@ -143,24 +149,26 @@ export default function Home() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-6xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold mb-2">Not authenticated</h1>
-          <p className="text-gray-600">Please open this app from Warpcast</p>
+          <div className="text-6xl mb-4 font-mono text-violet-600">🔒</div>
+          <h1 className="text-xl font-mono text-violet-600 mb-2">[ UNAUTHORIZED ]</h1>
+          <p className="text-slate-500 text-sm font-mono">Please open this app from Warpcast</p>
         </div>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <Header charCount={charCount} showCharCount={true} />
       <Navigation />
       <Editor
         fid={user.fid}
         existingEntry={todayEntry}
         onSave={handleEntrySaved}
+        onTextChange={handleTextChange}
       />
-    </>
+    </div>
   );
 }

@@ -2,16 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import { farcaster } from '@/lib/farcaster';
-import { Archive } from '@/components/Archive';
+import { Settings } from '@/components/Settings';
 import { Navigation } from '@/components/Navigation';
-import { Header } from '@/components/Header';
 import { useAuth } from '@/lib/auth-context';
 
-export default function ArchivePage() {
+export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<{ fid: number } | null>(null);
+  const [user, setUser] = useState<{ fid: number; username?: string } | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const { token, setToken } = useAuth();
+
+  useEffect(() => {
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    }
+  }, []);
 
   useEffect(() => {
     async function initApp() {
@@ -61,7 +70,7 @@ export default function ArchivePage() {
           }
         }
 
-        setUser({ fid: userData.fid });
+        setUser({ fid: userData.fid, username: userData.username });
         setIsLoading(false);
       } catch (err) {
         console.error('Initialization error:', err);
@@ -72,6 +81,13 @@ export default function ArchivePage() {
 
     initApp();
   }, [token, setToken]);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
 
   if (isLoading) {
     return (
@@ -109,10 +125,16 @@ export default function ArchivePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-      <Header charCount={0} showCharCount={false} />
+    <>
       <Navigation />
-      <Archive fid={user.fid} />
-    </div>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+        <Settings
+          toggleTheme={toggleTheme}
+          currentTheme={theme}
+          username={user.username}
+          walletAddress={undefined}
+        />
+      </div>
+    </>
   );
 }

@@ -45,7 +45,7 @@ export const db = {
     const result = await client.execute({
       sql: `
         SELECT id, mood, date, word_count, is_sealed,
-               substr(content, 1, 150) as excerpt
+               content, content_hash
         FROM entries
         WHERE fid = ?
         ORDER BY date DESC
@@ -117,5 +117,39 @@ export const db = {
     });
 
     return result.rows[0];
+  },
+
+  async getCurrentStreak(fid: number): Promise<number> {
+    // Get all entry dates for the user, ordered by date descending
+    const result = await client.execute({
+      sql: `
+        SELECT DISTINCT date(date / 1000, 'unixepoch') as entry_date
+        FROM entries
+        WHERE fid = ?
+        ORDER BY entry_date DESC
+      `,
+      args: [fid]
+    });
+
+    if (result.rows.length === 0) return 0;
+
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < result.rows.length; i++) {
+      const entryDate = new Date(result.rows[i].entry_date as string);
+      const expectedDate = new Date(today);
+      expectedDate.setDate(today.getDate() - i);
+      expectedDate.setHours(0, 0, 0, 0);
+
+      if (entryDate.getTime() === expectedDate.getTime()) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
   }
 };
