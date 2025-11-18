@@ -74,10 +74,10 @@ export default function StatsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-cyber-bg">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin h-12 w-12 border-b-2 border-violet mx-auto"></div>
+          <p className="mt-4 text-slate font-mono terminal-text text-xs">[ LOADING... ]</p>
         </div>
       </div>
     );
@@ -85,11 +85,11 @@ export default function StatsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-cyber-bg">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
-          <p className="text-gray-600">{error}</p>
+          <div className="text-6xl mb-4 font-mono text-red-400">!</div>
+          <h1 className="text-xl font-mono terminal-text text-violet mb-2">[ ERROR ]</h1>
+          <p className="text-slate text-sm font-mono">{error}</p>
         </div>
       </div>
     );
@@ -97,11 +97,11 @@ export default function StatsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-cyber-bg">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-6xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold mb-2">Not authenticated</h1>
-          <p className="text-gray-600">Please open this app from Warpcast</p>
+          <div className="text-6xl mb-4 font-mono text-violet">🔒</div>
+          <h1 className="text-xl font-mono terminal-text text-violet mb-2">[ UNAUTHORIZED ]</h1>
+          <p className="text-slate text-sm font-mono">Please open this app from Warpcast</p>
         </div>
       </div>
     );
@@ -110,11 +110,11 @@ export default function StatsPage() {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-white pt-24">
+      <div className="min-h-screen bg-cyber-bg pt-24">
         <div className="max-w-4xl mx-auto px-6 py-8">
-          <header className="mb-12">
-            <h1 className="text-2xl font-semibold mb-1">Stats</h1>
-            <p className="text-gray-500 text-sm">Your writing statistics</p>
+          <header className="mb-12 border-b border-cyber-border pb-6">
+            <h1 className="text-xl font-mono terminal-text text-violet mb-2">[ STATS ]</h1>
+            <p className="text-slate text-xs font-mono">Writing Metrics — Performance Analysis</p>
           </header>
 
           <Stats fid={user.fid} />
