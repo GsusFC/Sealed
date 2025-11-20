@@ -114,7 +114,7 @@ export function Editor({ fid, existingEntry, onSave, onTextChange }: EditorProps
     <div className="fixed inset-0 pt-14 pb-24 flex flex-col">
       {/* Content area with textarea */}
       <div className="flex-1 overflow-y-auto px-4 max-w-lg mx-auto w-full">
-        <div className="min-h-full flex flex-col justify-end py-4">
+        <div className="min-h-full flex flex-col justify-end pb-2">
           <textarea
             className="w-full min-h-[200px] bg-transparent text-slate-800 dark:text-slate-200 text-lg leading-relaxed font-mono resize-none focus:outline-none placeholder-slate-400 dark:placeholder-slate-800 transition-colors duration-300"
             placeholder="INITIATE ENTRY..."
@@ -130,7 +130,7 @@ export function Editor({ fid, existingEntry, onSave, onTextChange }: EditorProps
       </div>
 
       {/* Fixed button above navigation */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 pb-2 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 transition-colors duration-300">
+      <div className="fixed bottom-20 left-0 right-0 px-4 pb-3 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
         <div className="max-w-lg mx-auto">
           <button
             onClick={handleSeal}
